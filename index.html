@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0d0b08">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>Infinite Jesus — Sayings of Jesus</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg:#f2ead8;
+      --bg-deep:#e8dcc4;
+      --ink:#211b14;
+      --muted:#685c4b;
+      --gold:#8a6910;
+      --gold-soft:rgba(138,105,16,.22);
+      --surface:rgba(255,252,244,.62);
+      --control:rgba(255,252,244,.86);
+      --shadow:rgba(72,53,20,.12);
+    }
+    @media (prefers-color-scheme:dark) {
+      :root {
+        --bg:#0d0b08;
+        --bg-deep:#080705;
+        --ink:#f2ead8;
+        --muted:#b9ab93;
+        --gold:#d4af37;
+        --gold-soft:rgba(212,175,55,.28);
+        --surface:rgba(22,18,13,.68);
+        --control:rgba(25,21,15,.92);
+        --shadow:rgba(0,0,0,.3);
+      }
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-snap-type:y proximity;background:var(--bg-deep)}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:"Source Sans 3",ui-sans-serif,sans-serif;min-height:100vh;overflow-x:hidden}
+    button{font:inherit;color:inherit}
+    .hero{position:relative;min-height:42svh;display:grid;align-content:center;padding:clamp(3.5rem,10vh,7rem) max(1.25rem,calc((100vw - 68rem)/2));border-bottom:1px solid var(--gold-soft);overflow:hidden}
+    .hero::after{content:"";position:absolute;left:50%;bottom:-4.5rem;width:1px;height:11rem;background:linear-gradient(to bottom,transparent,var(--gold),transparent);transform:rotate(22deg);opacity:.55}
+    .hero-inner{width:min(100%,46rem)}
+    h1{font-family:"EB Garamond",Georgia,serif;font-weight:400;font-size:clamp(3.7rem,10vw,7.8rem);line-height:.82;letter-spacing:-.045em;margin:0 0 1.35rem}
+    .subtitle{font-family:"EB Garamond",Georgia,serif;font-size:clamp(1.18rem,2.4vw,1.5rem);line-height:1.45;margin:0;max-width:33rem;color:var(--muted)}
+    .stats{display:flex;align-items:center;gap:.7rem;margin:1.4rem 0 0;color:var(--gold);font-size:.76rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+    .stats span{width:2.1rem;height:1px;background:currentColor}
+    .toolbar-wrap{position:sticky;top:0;z-index:20;padding:.72rem max(.75rem,calc((100vw - 72rem)/2));background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--gold-soft)}
+    .toolbar{display:flex;align-items:center;justify-content:space-between;gap:.8rem}
+    .filters{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center}
+    .filter,.shuffle{appearance:none;border:0;background:transparent;cursor:pointer;min-height:2.45rem;padding:.5rem .68rem;border-radius:999px;font-size:.78rem;font-weight:600;color:var(--muted);transition:color .2s,background .2s}
+    .filter:hover,.filter:focus-visible,.shuffle:hover,.shuffle:focus-visible{color:var(--ink);background:var(--gold-soft);outline:none}
+    .filter[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+    .shuffle{flex:none;border:1px solid var(--gold-soft);display:inline-flex;align-items:center;gap:.45rem;color:var(--ink)}
+    .shuffle svg{width:1rem;height:1rem;fill:none;stroke:currentColor;stroke-width:1.6}
+    #stream{counter-reset:sayings}
+    .saying{counter-increment:sayings;position:relative;min-height:92svh;display:grid;place-items:center;padding:6rem 1.4rem 5rem;scroll-snap-align:start;border-bottom:1px solid var(--gold-soft);isolation:isolate}
+    .saying:nth-child(even){background:var(--surface)}
+    .saying-inner{width:min(100%,39rem);position:relative;padding-top:2.6rem}
+    .saying-inner::before{content:"";position:absolute;top:0;left:0;width:4.2rem;height:1px;background:var(--gold)}
+    blockquote{font-family:"EB Garamond",Georgia,serif;font-size:clamp(1.8rem,4.5vw,3.05rem);line-height:1.22;letter-spacing:-.018em;margin:0;text-wrap:balance}
+    .citation-row{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-top:2.15rem}
+    cite{font-style:normal;color:var(--gold);font-size:.71rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;line-height:1.5}
+    .card-actions{display:flex;gap:.45rem;flex:none}
+    .copy,.meaning-toggle{appearance:none;border:1px solid var(--gold-soft);background:var(--control);border-radius:999px;min-height:2.35rem;padding:.45rem .72rem;display:inline-flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.75rem;font-weight:600;color:var(--muted);transition:border-color .2s,color .2s,background .2s}
+    .copy:hover,.copy:focus-visible,.meaning-toggle:hover,.meaning-toggle:focus-visible{border-color:var(--gold);color:var(--ink);outline:none}
+    .meaning-toggle[aria-expanded="true"]{border-color:var(--gold);background:var(--gold-soft);color:var(--ink)}
+    .copy svg,.meaning-toggle svg{width:.9rem;height:.9rem;fill:none;stroke:currentColor;stroke-width:1.7}
+    .meaning{margin-top:1.25rem;padding:1.1rem 0 0;border-top:1px solid var(--gold-soft)}
+    .meaning[hidden]{display:none}
+    .meaning-label{margin:0 0 .35rem;color:var(--gold);font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+    .meaning-text{margin:0;color:var(--muted);font-family:"EB Garamond",Georgia,serif;font-size:1.13rem;line-height:1.55}
+    .saying.is-visible .saying-inner{animation:reveal .8s cubic-bezier(.22,.72,.2,1) both}
+    @keyframes reveal{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+    .sentinel{height:1px}
+    footer{padding:5rem 1.4rem calc(5rem + env(safe-area-inset-bottom));text-align:center;background:var(--bg-deep);color:var(--muted);font-family:"EB Garamond",Georgia,serif;font-size:1.06rem;line-height:1.65}
+    footer p{max-width:42rem;margin:.25rem auto} footer a{color:var(--gold);text-underline-offset:.18em}
+    footer .mark{display:block;color:var(--gold);font-size:1.7rem;margin-bottom:1rem}
+    .status{position:fixed;left:50%;bottom:calc(1rem + env(safe-area-inset-bottom));z-index:50;transform:translateX(-50%) translateY(1rem);opacity:0;pointer-events:none;background:var(--ink);color:var(--bg);padding:.6rem .9rem;border-radius:999px;font-size:.8rem;box-shadow:0 8px 28px var(--shadow);transition:.2s}
+    .status.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    @media(max-width:760px){
+      .hero{min-height:36svh;padding-top:4.5rem;padding-bottom:3.5rem}
+      .toolbar-wrap{padding:.58rem .65rem}
+      .toolbar{align-items:flex-start}
+      .filters{display:grid;grid-template-columns:repeat(4,max-content);gap:.12rem .2rem}
+      .filter{min-height:2.15rem;padding:.35rem .52rem;font-size:.72rem}
+      .filter .long{display:none}
+      .shuffle{width:2.3rem;height:2.3rem;justify-content:center;padding:0}
+      .shuffle span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+      .saying{min-height:88svh;padding:5rem 1.25rem 4rem}
+      .citation-row{align-items:flex-start;flex-direction:column}
+      cite{max-width:none}
+      .card-actions{width:100%}
+      .copy,.meaning-toggle{flex:1;justify-content:center}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.saying.is-visible .saying-inner{animation:none}.filter,.shuffle,.copy,.meaning-toggle,.status{transition:none}}
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>Infinite<br>Jesus</h1>
+      <p class="subtitle">An endless stream of sayings of Jesus from the Bible and four early Christian texts.</p>
+      <p class="stats">323 sayings <span aria-hidden="true"></span> 12 texts</p>
+    </div>
+  </header>
+
+  <div class="toolbar-wrap">
+    <nav class="toolbar" aria-label="Filter sayings">
+      <div class="filters" role="group" aria-label="Sources">
+        <button class="filter" data-source="all" aria-pressed="true">All</button>
+        <button class="filter" data-source="thomas" aria-pressed="false">Thomas</button>
+        <button class="filter" data-source="philip" aria-pressed="false">Philip</button>
+        <button class="filter" data-source="dialogue" aria-pressed="false">Dialogue</button>
+        <button class="filter" data-source="pistis" aria-pressed="false"><span class="long">Pistis </span>Sophia</button>
+        <button class="filter" data-source="matthew" aria-pressed="false">Matthew</button>
+        <button class="filter" data-source="mark" aria-pressed="false">Mark</button>
+        <button class="filter" data-source="luke" aria-pressed="false">Luke</button>
+        <button class="filter" data-source="john" aria-pressed="false">John</button>
+        <button class="filter" data-source="acts" aria-pressed="false">Acts</button>
+        <button class="filter" data-source="letters" aria-pressed="false">Letters</button>
+        <button class="filter" data-source="revelation" aria-pressed="false">Revelation</button>
+      </div>
+      <button class="shuffle" id="shuffle" aria-label="Show a fresh random saying" title="Shuffle">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h3c5 0 6 10 11 10h4M18 14l3 3-3 3M3 17h3c2.3 0 3.7-2.2 5-4.5M15 7h6M18 4l3 3-3 3"/></svg><span>Shuffle</span>
+      </button>
+    </nav>
+  </div>
+
+  <main id="stream" aria-live="polite"></main>
+  <div class="sentinel" id="sentinel" aria-hidden="true"></div>
+  <footer>
+    <span class="mark" aria-hidden="true">✦</span>
+    <p>Selections from the four canonical Gospels, the Nag Hammadi library, and other early Christian writings.</p>
+    <p>Biblical quotations: <a href="http://ebible.org/details.php?id=eng-web" target="_blank" rel="noopener">World English Bible</a> (public domain). Other translations by Thomas O. Lambdin, Wesley W. Isenberg, Robert M. Grant, Stephen Emmel, and G. R. S. Mead.</p>
+  </footer>
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+
+  <script src="sayings.js"></script>
+<script>
+        const stream=document.getElementById('stream');
+    const sentinel=document.getElementById('sentinel');
+    const statusEl=document.getElementById('status');
+    const sourceLabels={thomas:'Gospel of Thomas',philip:'Gospel of Philip',dialogue:'Dialogue of the Saviour',pistis:'Pistis Sophia',matthew:'Gospel of Matthew',mark:'Gospel of Mark',luke:'Gospel of Luke',john:'Gospel of John',acts:'Acts of the Apostles',letters:'New Testament Letters',revelation:'Revelation'};
+    const THOMAS_MEANINGS={
+      1:"Understanding these teachings is presented as a path beyond spiritual death.",
+      2:"A sincere search for truth may unsettle us before it opens into wonder and freedom.",
+      3:"The kingdom is not a distant place; it is discovered through self-knowledge and awakened perception.",
+      4:"Wisdom can come from the most unexpected source, and the usual rankings of age and status are overturned.",
+      5:"Attend honestly to what is before you; clear seeing brings hidden truth into the open.",
+      6:"Integrity matters more than religious performance: do not lie, and do not act against your conscience.",
+      7:"The lion can symbolize our fierce, instinctive nature: transformed and integrated, it serves us; unchecked, it rules us.",
+      8:"Wisdom recognizes what is truly valuable and lets lesser distractions go.",
+      9:"The same teaching bears different fruit depending on the readiness and depth of the person receiving it.",
+      10:"Jesus describes his message as a fire of transformation that has begun but is not yet complete.",
+      11:"Everything temporary passes; the saying asks how divided human life can return to its original unity and light.",
+      12:"The community is directed toward James the Righteous as a trustworthy guide after Jesus' departure.",
+      13:"Jesus cannot be captured by ordinary labels; direct encounter surpasses secondhand descriptions.",
+      14:"Rituals become harmful when treated as ends in themselves; hospitality, healing, and truthful speech reveal the heart.",
+      15:"The saying points beyond ordinary human origins toward the divine source of life.",
+      16:"Truth does not always preserve social peace; commitment to it can expose divisions, even within families.",
+      17:"Divine reality exceeds the limits of the senses and ordinary imagination.",
+      18:"To understand the end, return to the beginning—the source in which life's meaning is already held.",
+      19:"The saying praises an eternal identity that precedes ordinary life and promises life through deep acquaintance with divine realities.",
+      20:"The kingdom begins almost invisibly but can grow into something spacious and life-giving.",
+      21:"Live without clinging to what cannot truly be possessed, and remain alert for the moment that calls for wise action.",
+      22:"Entering the kingdom means healing inner divisions and becoming whole beyond familiar oppositions.",
+      23:"Those who awaken are rare, but their separateness is overcome in a deeper unity.",
+      24:"The place of Jesus is found as an inner light that becomes visible through the life of an awakened person.",
+      25:"Love and protect another person with the same care you give your own life and sight.",
+      26:"Self-examination must come before correcting someone else.",
+      27:"To fast from the world is to loosen its grip on you; true Sabbath is a transformed way of seeing.",
+      28:"People are spiritually intoxicated and unaware of their need; awakening begins when that stupor wears off.",
+      29:"Spirit dwelling in fragile material existence is the astonishing wealth hidden within human poverty.",
+      30:"Divine presence is not confined to crowds or institutions; it can be encountered in the smallest gathering or in solitude.",
+      31:"Familiarity can keep people from recognizing wisdom or receiving healing from someone they think they already know.",
+      32:"A life firmly established in truth is both secure and impossible to conceal.",
+      33:"Insight is meant to be made visible and shared, not kept hidden.",
+      34:"A guide without genuine insight only leads others into the same confusion.",
+      35:"Before a powerful inner force can be overcome, it must first be recognized and restrained.",
+      36:"Release anxious preoccupation with outward needs and appearances.",
+      37:"Childlike freedom from shame, status, and social coverings makes a fearless vision of the divine possible.",
+      38:"Value living wisdom while it is present; a time may come when the opportunity has passed.",
+      39:"Religious authorities can obstruct direct knowledge; disciples should combine discernment with innocence.",
+      40:"Whatever is not rooted in the divine source cannot endure.",
+      41:"Spiritual receptivity grows through use, while neglected awareness diminishes.",
+      42:"Move through the world without clinging to it as a permanent home.",
+      43:"A teacher is known by the fruit of the teaching, yet people often split the source from what it produces.",
+      44:"Rejecting the Spirit means refusing the very presence through which recognition and forgiveness become possible.",
+      45:"Words and actions reveal what the heart has been storing; good fruit requires an inwardly good source.",
+      46:"Even great religious stature is surpassed by the childlike openness needed to know the kingdom.",
+      47:"A divided loyalty cannot hold, and genuinely new life cannot simply be forced into old forms.",
+      48:"When division is reconciled and people become one, even what seems immovable can change.",
+      49:"The 'solitary' are those restored to inner unity and conscious of their origin in the kingdom.",
+      50:"Human beings come from divine light; their signs are living movement joined with inward rest.",
+      51:"The renewed world is already present, but ordinary perception fails to recognize it.",
+      52:"Do not let reverence for past authorities prevent recognition of living truth before you.",
+      53:"External marks do not create holiness; the transformation that matters is inward and spiritual.",
+      54:"Those who possess little may be especially open to receiving the kingdom.",
+      55:"Discipleship asks for a loyalty deeper than family attachment and a willingness to bear its cost.",
+      56:"To see the world's impermanence clearly is to stop treating it as the source of life.",
+      57:"Good and harmful growth are entangled for a time; final discernment must wait until their fruit is clear.",
+      58:"Enduring a difficult search can lead to genuine life rather than easy certainty.",
+      59:"Seek the living reality while you are alive, before the capacity to encounter it is lost.",
+      60:"Do not become spiritually lifeless through consumption and attachment; seek the rest that preserves life.",
+      61:"Outward closeness does not guarantee the same inner destiny; wholeness depends on overcoming division.",
+      62:"Sacred insight is given where it can be received, and true goodness is practiced without display.",
+      63:"The rich man's careful plans cannot protect him from death; possession without awareness is empty.",
+      64:"Ordinary obligations and possessions can become excuses that keep people from accepting the invitation to the kingdom.",
+      65:"The violent tenants portray people who seize what was entrusted to them and reject every call to accountability.",
+      66:"What people dismiss as useless may become the essential foundation.",
+      67:"Knowing everything except oneself leaves the most important knowledge missing.",
+      68:"Rejection for the sake of truth can reveal a dignity and belonging the world cannot give.",
+      69:"Blessing belongs to those who suffer inwardly for truth and who hunger deeply enough to be filled.",
+      70:"What is latent within you must be brought forth; unexpressed truth becomes destructive rather than saving.",
+      71:"This cryptic promise points to the collapse of an old dwelling or identity and the emergence of another.",
+      72:"Jesus refuses to reduce his role to settling possessions and family claims.",
+      73:"The world is ready for awakening, but too few people are willing to do the work.",
+      74:"Many gather around the source of life without actually entering or drawing from it.",
+      75:"Many approach the threshold, but only those who become inwardly whole enter the place of union.",
+      76:"Once the highest value is recognized, wisdom gives up every lesser possession to receive it.",
+      77:"Divine light pervades everything; the sacred can be encountered even in ordinary matter.",
+      78:"Do not seek truth in spectacle, luxury, or status; prophetic wisdom rarely wears those clothes.",
+      79:"Physical kinship is not the highest blessing; hearing and living the divine word is deeper.",
+      80:"Recognizing the body's limits exposes the world's limits and loosens its claim on us.",
+      81:"Use influence responsibly, but anyone held by power or wealth must learn to renounce it.",
+      82:"Nearness to Jesus is nearness to transforming fire; distance from him is distance from the kingdom.",
+      83:"Visible forms hint at divine light, but the light itself is hidden behind the images.",
+      84:"Our earthly likeness is easy to see; encountering our timeless image is overwhelming because it precedes us.",
+      85:"Even Adam's greatness did not guarantee immortality; origin and status alone are not enough.",
+      86:"Animals have secure places, while the human seeker remains unsettled and without a permanent worldly home.",
+      87:"A soul dependent on a body—and a body dependent on another body—remains trapped in a fragile chain of dependence.",
+      88:"Messengers offer what is already potentially yours, while also asking for the response only you can give.",
+      89:"Outward cleanliness is incomplete without inward transformation; both come from the same creator.",
+      90:"Jesus offers a form of discipleship that is restful rather than oppressive.",
+      91:"People read signs in nature yet fail to recognize the spiritual reality directly before them.",
+      92:"Keep asking, but understand that the deepest answers require readiness as well as curiosity.",
+      93:"Sacred insight should be offered with discernment, not where it will be mocked or destroyed.",
+      94:"Persistent seeking and asking open what initially seems closed.",
+      95:"Give freely rather than turning generosity into another form of profit.",
+      96:"The kingdom works quietly from within until its influence has transformed the whole.",
+      97:"What we assume we possess can drain away unnoticed; awareness may come only after the vessel is empty.",
+      98:"Inner freedom requires preparation, resolve, and confronting the force that keeps us captive.",
+      99:"Spiritual kinship is created by doing the Father's will, not merely by blood relation.",
+      100:"Give worldly powers what bears their mark, while giving the divine what belongs to the divine.",
+      101:"Natural family ties must become secondary to the source of true life and spiritual identity.",
+      102:"Gatekeepers who neither enter nor let others enter turn religion into an obstacle.",
+      103:"Awareness of where danger enters lets a person guard the inner house before it is robbed.",
+      104:"Fasting and prayer have their season, but celebration is fitting while the divine presence is near.",
+      105:"One who discovers a higher spiritual origin may be misunderstood or dishonored by ordinary society.",
+      106:"When inner division becomes unity, the seemingly impossible becomes possible.",
+      107:"The one who is lost is not expendable; love leaves the many to seek and restore that one.",
+      108:"To receive Jesus' words deeply is to share in his life and become like him.",
+      109:"A treasure can lie hidden within ordinary life until discovery reveals its immense value.",
+      110:"Even after gaining the world, freedom requires letting go of ownership and attachment.",
+      111:"Cosmic structures pass away, but awakened life is not subject to the same death.",
+      112:"Neither body nor spirit should be reduced to serving the other blindly; dependence without awareness is impoverishing.",
+      113:"The kingdom is already spread across the world, but people do not perceive what surrounds them.",
+      114:"In its ancient symbolic language, the saying imagines salvation as transcending the gender divisions of its culture so that every disciple may become a fully living spirit."
+    };
+    function meaningFor(item){
+      if(item.meaning)return item.meaning;
+      if(item.source==='thomas'){
+        const match=item.citation.match(/Saying (\d+)/);
+        if(match&&THOMAS_MEANINGS[match[1]])return THOMAS_MEANINGS[match[1]];
+      }
+      const t=item.text.toLowerCase();
+      if(/question what thou wilt/.test(t))return "Jesus welcomes honest inquiry, presenting the search for understanding as open rather than forbidden.";
+      if(/not come to call the righteous/.test(t))return "The mission is directed toward those who know they need mercy, not those satisfied with their own righteousness.";
+      if(/renounce all/.test(t))return "Ascent toward divine light requires releasing the attachments that keep the soul bound to lesser things.";
+      if(/repentance|forgiv(e|ing)|wipe out the sins/.test(t))return "Divine mercy remains open to repentance, offering restoration rather than leaving a person fixed in past wrongdoing.";
+      if(/mysteries? of the (light|kingdom)|light-kingdom/.test(t))return "The mysteries symbolize an inward initiation that awakens the soul and guides it back toward divine Light.";
+      if(/baptis|chrism|eucharist|bridal chamber/.test(t))return "Sacred rites are presented as signs of inner transformation and union with the divine, not merely outward ceremonies.";
+      if(/resurrection/.test(t))return "Resurrection is described as a reality to awaken to now, rather than only an event expected after death.";
+      if(/naked|garment|clothe/.test(t))return "Clothing symbolizes the identities we put on; the saying points toward a truer self no longer hidden by appearances.";
+      if(/light/.test(t)&&/dark/.test(t))return "Light and darkness name two ways of being: awakened knowledge brings freedom, while ignorance keeps the soul divided.";
+      if(/light/.test(t))return "Light symbolizes divine knowledge and life, which awaken the soul and draw it back toward its source.";
+      if(/ignorance|knowledge|knoweth|knows/.test(t))return "Freedom begins in true knowledge: ignorance hides our origin, while recognition restores a person to spiritual life.";
+      if(/truth/.test(t)&&/name|word/.test(t))return "Spiritual words have power only when they arise from lived truth rather than from labels repeated without understanding.";
+      if(/truth/.test(t))return "Truth is not merely an idea here; it is a reality that must be recognized inwardly and embodied.";
+      if(/father.*son|son.*father|holy spirit/.test(t))return "The saying uses the language of Father, Son, and Spirit to describe divine life shared through relationship and revelation.";
+      if(/male|female|woman|womanhood/.test(t))return "The imagery points beyond fixed social and bodily divisions toward a spiritual identity made whole in the divine.";
+      if(/slave|free|freedom|captiv/.test(t))return "True freedom is inward: it comes from release from ignorance, compulsion, and the powers that claim ownership of the soul.";
+      if(/poor|rich|wealth|treasure|pearl/.test(t))return "The saying reverses ordinary ideas of wealth, treating spiritual recognition as the treasure that gives everything else its value.";
+      if(/world/.test(t))return "The world is portrayed as temporary and distracting; wisdom lives in it without mistaking it for the soul's final home.";
+      if(/death|dead|ament[eē]/.test(t))return "The warning contrasts spiritual life with the consequences of remaining alienated from truth and the divine source.";
+      if(/love|faith/.test(t))return "Faith opens the way toward divine reality, while love gives that recognition its living form.";
+      if(/rest/.test(t))return "Rest means more than relief from effort: it is the soul's settled return to wholeness in its source.";
+      if(/seek|find|knock/.test(t))return "The saying urges an active search for truth, promising that sincere seeking can become direct recognition.";
+      if(/one|unity|united|union/.test(t))return "Its central image is wholeness: what appears divided is gathered into a deeper spiritual unity.";
+      if(/evil|sin/.test(t))return "The passage treats wrongdoing as a condition that can be exposed, cleansed, and transformed rather than concealed.";
+      if(/image|likeness|type/.test(t))return "Visible forms are signs of a deeper reality; wisdom looks through the image toward what it reveals.";
+      if(/eat|food|bread|wine/.test(t))return "Food and drink become images of spiritual participation: what is truly received changes the person who receives it.";
+      if(/heart|within|inside|soul/.test(t))return "The decisive movement happens within: the soul must recognize and embody the truth rather than only hear it outwardly.";
+      if(/cross|suffer|persecut/.test(t))return "Discipleship includes accepting the cost of truth without letting suffering sever the soul from its source.";
+      if(/kingdom/.test(t))return "The kingdom is presented as a transformed way of being, entered through recognition rather than reached as an ordinary place.";
+      if(item.source==='philip')return "This saying uses symbolic language to distinguish outward appearances from the inward reality that transforms a person.";
+      if(item.source==='dialogue')return "The teaching calls the disciple from surface answers toward discernment, self-knowledge, and freedom from attachment.";
+      return "The passage presents spiritual awakening as a movement away from ignorance and toward mercy, transformation, and divine Light.";
+    }
+    let activeSource='all',deck=[],deckIndex=0,cycleLast=null,statusTimer,cardId=0;
+
+    function shuffleArray(values){
+      const a=values.slice();
+      for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+      if(a.length>1&&cycleLast&&a[0]===cycleLast){[a[0],a[1]]=[a[1],a[0]]}
+      return a;
+    }
+    function resetDeck(){
+      const pool=SAYINGS.filter(s=>activeSource==='all'||s.source===activeSource);
+      deck=shuffleArray(pool);deckIndex=0;
+    }
+    function nextSaying(){
+      if(deckIndex>=deck.length)resetDeck();
+      const item=deck[deckIndex++];cycleLast=item;return item;
+    }
+    function copyIcon(){return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="1"/><path d="M16 8V5H5v11h3"/></svg>'}
+    function meaningIcon(){return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 10.5v5M12 7.5v.1"/></svg>'}
+    function createCard(item){
+      const id='meaning-'+(++cardId);
+      const article=document.createElement('article');article.className='saying';article.dataset.source=item.source;
+      const inner=document.createElement('div');inner.className='saying-inner';
+      const quote=document.createElement('blockquote');quote.textContent=item.text;
+      const row=document.createElement('div');row.className='citation-row';
+      const cite=document.createElement('cite');cite.textContent=item.citation;
+      const actions=document.createElement('div');actions.className='card-actions';
+      const meaningButton=document.createElement('button');meaningButton.className='meaning-toggle';meaningButton.type='button';meaningButton.setAttribute('aria-expanded','false');meaningButton.setAttribute('aria-controls',id);meaningButton.innerHTML=meaningIcon()+'<span>Meaning</span>';
+      const copyButton=document.createElement('button');copyButton.className='copy';copyButton.type='button';copyButton.setAttribute('aria-label','Copy saying from '+item.citation);copyButton.innerHTML=copyIcon()+'<span>Copy</span>';
+      const meaning=document.createElement('div');meaning.className='meaning';meaning.id=id;meaning.hidden=true;
+      const meaningLabel=document.createElement('p');meaningLabel.className='meaning-label';meaningLabel.textContent='A plain-language reading';
+      const meaningText=document.createElement('p');meaningText.className='meaning-text';meaningText.textContent=meaningFor(item);
+      meaning.append(meaningLabel,meaningText);
+      meaningButton.addEventListener('click',()=>toggleMeaning(meaningButton,meaning));
+      copyButton.addEventListener('click',()=>copySaying(item,copyButton));
+      actions.append(meaningButton,copyButton);row.append(cite,actions);inner.append(quote,row,meaning);article.append(inner);revealObserver.observe(article);return article;
+    }
+    function appendBatch(count){const frag=document.createDocumentFragment();for(let i=0;i<count;i++)frag.append(createCard(nextSaying()));stream.append(frag)}
+    function showStatus(message){statusEl.textContent=message;statusEl.classList.add('show');clearTimeout(statusTimer);statusTimer=setTimeout(()=>statusEl.classList.remove('show'),1700)}
+    function toggleMeaning(button,panel){
+      const opening=button.getAttribute('aria-expanded')!=='true';
+      button.setAttribute('aria-expanded',String(opening));panel.hidden=!opening;
+      button.querySelector('span').textContent=opening?'Hide meaning':'Meaning';
+    }
+    async function copySaying(item,button){
+      const text=`“${item.text}”\n— ${item.citation}`;
+      try{await navigator.clipboard.writeText(text)}catch(e){const t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';document.body.append(t);t.select();document.execCommand('copy');t.remove()}
+      const label=button.querySelector('span');label.textContent='Copied';showStatus('Saying copied');setTimeout(()=>label.textContent='Copy',1400)
+    }
+    function chooseSource(source){
+      activeSource=source;cycleLast=null;resetDeck();stream.replaceChildren();appendBatch(3);
+      document.querySelectorAll('.filter').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.source===source)));
+      const label=source==='all'?'All texts':sourceLabels[source];showStatus(label);
+      requestAnimationFrame(()=>stream.firstElementChild&&stream.firstElementChild.scrollIntoView({behavior:'smooth',block:'start'}));
+    }
+    document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>chooseSource(btn.dataset.source)));
+    document.getElementById('shuffle').addEventListener('click',()=>{
+      resetDeck();const fresh=createCard(nextSaying());stream.prepend(fresh);requestAnimationFrame(()=>fresh.scrollIntoView({behavior:'smooth',block:'start'}));showStatus('A fresh saying');
+    });
+    const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');revealObserver.unobserve(entry.target)}}),{threshold:.18});
+    const loadObserver=new IntersectionObserver(entries=>{if(entries[0].isIntersecting)appendBatch(6)},{rootMargin:'1200px 0px'});
+    resetDeck();appendBatch(3);loadObserver.observe(sentinel);
+  </script>
+</body>
+</html>
